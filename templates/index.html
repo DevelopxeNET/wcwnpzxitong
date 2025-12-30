@@ -1,0 +1,550 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>物流凭证查询系统</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Microsoft YaHei', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 32px;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        .api-link {
+            position: absolute;
+            right: 30px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 8px;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .api-link:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-50%) translateX(3px);
+        }
+
+        .search-container {
+            padding: 30px;
+            background: white;
+            border-bottom: 2px solid #e9ecef;
+        }
+
+        .search-form {
+            display: flex;
+            gap: 15px;
+            max-width: 1000px;
+            margin: 0 auto;
+            flex-wrap: wrap;
+            align-items: flex-end;
+        }
+
+        .form-group {
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #495057;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn {
+            padding: 12px 30px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #5a6268;
+            transform: translateY(-2px);
+        }
+
+        /* 弹窗样式 */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.9);
+            animation: fadeIn 0.3s ease;
+        }
+
+        .modal.show {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .modal-content {
+            position: relative;
+            max-width: 90%;
+            max-height: 90%;
+            animation: zoomIn 0.3s ease;
+        }
+
+        @keyframes zoomIn {
+            from { transform: scale(0.8); }
+            to { transform: scale(1); }
+        }
+
+        .modal-content img {
+            max-width: 100%;
+            max-height: 85vh;
+            border-radius: 10px;
+            box-shadow: 0 10px 50px rgba(0, 0, 0, 0.5);
+        }
+
+        .modal-close {
+            position: absolute;
+            top: -40px;
+            right: 0;
+            color: white;
+            font-size: 35px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .modal-close:hover {
+            color: #667eea;
+            transform: rotate(90deg);
+        }
+
+        .modal-download {
+            position: absolute;
+            bottom: -50px;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 12px 30px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+        }
+
+        .modal-download:hover {
+            transform: translateX(-50%) translateY(-3px);
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.5);
+        }
+
+        .image-btn {
+            display: inline-block;
+            padding: 6px 15px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            text-decoration: none;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: none;
+        }
+
+        .image-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+
+        .stats {
+            display: flex;
+            justify-content: space-around;
+            padding: 20px;
+            background: #f8f9fa;
+            border-bottom: 2px solid #e9ecef;
+        }
+
+        .stat-item {
+            text-align: center;
+            padding: 10px 20px;
+        }
+
+        .stat-number {
+            font-size: 28px;
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .stat-label {
+            font-size: 14px;
+            color: #6c757d;
+            margin-top: 5px;
+        }
+
+        .table-container {
+            padding: 20px;
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+        }
+
+        thead {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        thead th {
+            padding: 15px 10px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 14px;
+            white-space: nowrap;
+        }
+
+        tbody tr {
+            border-bottom: 1px solid #e9ecef;
+            transition: all 0.3s ease;
+        }
+
+        tbody tr:hover {
+            background: #f8f9fa;
+            transform: scale(1.01);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        tbody td {
+            padding: 15px 10px;
+            font-size: 13px;
+            color: #495057;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        .status-signed {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status-transit {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .status-delivering {
+            background: #d1ecf1;
+            color: #0c5460;
+        }
+
+        .image-link {
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .image-link:hover {
+            color: #764ba2;
+            text-decoration: underline;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #6c757d;
+        }
+
+        .empty-state i {
+            font-size: 64px;
+            margin-bottom: 20px;
+            opacity: 0.3;
+        }
+
+        .footer {
+            text-align: center;
+            padding: 20px;
+            background: #f8f9fa;
+            color: #6c757d;
+            font-size: 13px;
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 24px;
+            }
+
+            .stats {
+                flex-direction: column;
+            }
+
+            .stat-item {
+                margin-bottom: 10px;
+            }
+
+            .table-container {
+                padding: 10px;
+            }
+
+            thead th, tbody td {
+                padding: 10px 5px;
+                font-size: 12px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🚚 物流凭证查询系统</h1>
+            <p>实时追踪物流信息 · 查看签收凭证</p>
+            <a href="/api-docs" class="api-link">📚 API文档</a>
+        </div>
+
+        <div class="search-container">
+            <form class="search-form" method="GET" action="/">
+                <div class="form-group">
+                    <label for="order_no">📝 订单号</label>
+                    <input type="text" id="order_no" name="order_no" placeholder="请输入订单号" value="{{ order_no }}">
+                </div>
+                <div class="form-group">
+                    <label for="tracking_no">🚚 物流单号</label>
+                    <input type="text" id="tracking_no" name="tracking_no" placeholder="请输入物流单号" value="{{ tracking_no }}">
+                </div>
+                <div class="btn-group">
+                    <button type="submit" class="btn btn-primary">🔍 查询</button>
+                    <button type="button" class="btn btn-secondary" onclick="window.location.href='/'">🔄 重置</button>
+                </div>
+            </form>
+        </div>
+
+        <div class="stats">
+            {% if order_no or tracking_no %}
+            <div class="stat-item">
+                <div class="stat-number" style="font-size: 20px; color: #28a745;">✓ 查询结果</div>
+                <div class="stat-label">
+                    {% if order_no %}订单号: {{ order_no }}{% endif %}
+                    {% if tracking_no %}{% if order_no %} | {% endif %}物流单号: {{ tracking_no }}{% endif %}
+                </div>
+            </div>
+            {% endif %}
+            <div class="stat-item">
+                <div class="stat-number">{{ records|length }}</div>
+                <div class="stat-label">总订单数</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number">{{ records|selectattr('logistics_status', 'equalto', '已签收')|list|length }}</div>
+                <div class="stat-label">已签收</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number">{{ records|selectattr('logistics_status', 'ne', '已签收')|list|length }}</div>
+                <div class="stat-label">运输中</div>
+            </div>
+        </div>
+
+        <div class="table-container">
+            {% if records %}
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>订单号</th>
+                        <th>物流渠道</th>
+                        <th>物流单号</th>
+                        <th>查询时间</th>
+                        <th>物流状态</th>
+                        <th>签收时间</th>
+                        <th>图片凭证</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for record in records %}
+                    <tr>
+                        <td>{{ record.id }}</td>
+                        <td><strong>{{ record.order_no }}</strong></td>
+                        <td>{{ record.logistics_channel }}</td>
+                        <td>{{ record.tracking_no }}</td>
+                        <td>{{ record.query_time.strftime('%Y-%m-%d %H:%M') if record.query_time else '-' }}</td>
+                        <td>
+                            {% if record.logistics_status == '已签收' %}
+                                <span class="status-badge status-signed">✓ {{ record.logistics_status }}</span>
+                            {% elif record.logistics_status == '运输中' %}
+                                <span class="status-badge status-transit">⟳ {{ record.logistics_status }}</span>
+                            {% elif record.logistics_status == '派送中' %}
+                                <span class="status-badge status-delivering">📦 {{ record.logistics_status }}</span>
+                            {% else %}
+                                <span class="status-badge">{{ record.logistics_status }}</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if record.signed_time %}
+                                <strong>{{ record.signed_time.strftime('%Y-%m-%d') }}</strong>
+                            {% else %}
+                                <span style="color: #adb5bd;">-</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if record.image_url %}
+                                <button class="image-btn" onclick="showImage('{{ record.image_url }}', '{{ record.order_no }}')">📷 查看凭证</button>
+                            {% else %}
+                                <span style="color: #adb5bd;">暂无</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% else %}
+            <div class="empty-state">
+                <div style="font-size: 64px; margin-bottom: 20px;">📦</div>
+                <h3>暂无数据</h3>
+                <p style="margin-top: 10px;">还没有物流凭证记录</p>
+            </div>
+            {% endif %}
+        </div>
+
+        <div class="footer">
+            © 2025 物流凭证查询系统 | 数据实时更新
+        </div>
+    </div>
+
+    <!-- 图片弹窗 -->
+    <div id="imageModal" class="modal" onclick="closeModal()">
+        <div class="modal-content" onclick="event.stopPropagation()">
+            <span class="modal-close" onclick="closeModal()">&times;</span>
+            <img id="modalImage" src="" alt="物流凭证">
+            <button class="modal-download" onclick="downloadImage()">💾 下载凭证</button>
+        </div>
+    </div>
+
+    <script>
+        let currentImageUrl = '';
+        let currentOrderNo = '';
+
+        function showImage(imageUrl, orderNo) {
+            currentImageUrl = imageUrl;
+            currentOrderNo = orderNo;
+            document.getElementById('modalImage').src = imageUrl;
+            document.getElementById('imageModal').classList.add('show');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeModal() {
+            document.getElementById('imageModal').classList.remove('show');
+            document.body.style.overflow = 'auto';
+        }
+
+        function downloadImage() {
+            const link = document.createElement('a');
+            link.href = currentImageUrl;
+            link.download = `物流凭证_${currentOrderNo}.jpg`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        // ESC键关闭弹窗
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Escape') {
+                closeModal();
+            }
+        });
+    </script>
+</body>
+</html>

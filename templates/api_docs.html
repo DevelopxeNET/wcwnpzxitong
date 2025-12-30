@@ -1,0 +1,620 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>API 接口文档 - 物流凭证查询系统</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Microsoft YaHei', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+            position: relative;
+        }
+
+        .header h1 {
+            font-size: 32px;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        .back-btn {
+            position: absolute;
+            left: 30px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 8px;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            font-size: 14px;
+        }
+
+        .back-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-50%) translateX(-3px);
+        }
+
+        .content {
+            padding: 40px;
+        }
+
+        .section {
+            margin-bottom: 40px;
+        }
+
+        .section-title {
+            font-size: 24px;
+            color: #667eea;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 3px solid #667eea;
+            display: flex;
+            align-items: center;
+        }
+
+        .section-title::before {
+            content: '📋';
+            margin-right: 10px;
+        }
+
+        .info-box {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            border-left: 4px solid #667eea;
+        }
+
+        .info-item {
+            display: flex;
+            margin-bottom: 10px;
+            font-size: 14px;
+        }
+
+        .info-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .info-label {
+            font-weight: 600;
+            color: #495057;
+            min-width: 100px;
+        }
+
+        .info-value {
+            color: #6c757d;
+            flex: 1;
+        }
+
+        .endpoint {
+            background: #667eea;
+            color: white;
+            padding: 15px 20px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 16px;
+            margin-bottom: 20px;
+            word-break: break-all;
+        }
+
+        .method-badge {
+            display: inline-block;
+            background: #28a745;
+            color: white;
+            padding: 4px 12px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-right: 10px;
+        }
+
+        .code-block {
+            background: #2d3748;
+            color: #e2e8f0;
+            padding: 20px;
+            border-radius: 10px;
+            overflow-x: auto;
+            margin: 15px 0;
+            position: relative;
+        }
+
+        .code-block pre {
+            margin: 0;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            line-height: 1.6;
+        }
+
+        .copy-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            padding: 6px 15px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: all 0.3s ease;
+        }
+
+        .copy-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .table-container {
+            overflow-x: auto;
+            margin: 15px 0;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+        }
+
+        thead {
+            background: #f8f9fa;
+        }
+
+        thead th {
+            padding: 12px;
+            text-align: left;
+            font-weight: 600;
+            color: #495057;
+            border-bottom: 2px solid #dee2e6;
+            font-size: 14px;
+        }
+
+        tbody td {
+            padding: 12px;
+            border-bottom: 1px solid #dee2e6;
+            font-size: 13px;
+            color: #6c757d;
+        }
+
+        .status-code {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 4px;
+            font-weight: 600;
+            font-size: 12px;
+        }
+
+        .status-200 {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status-404 {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .status-500 {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .try-it {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 10px;
+            margin-top: 30px;
+        }
+
+        .try-it h3 {
+            margin-bottom: 20px;
+            font-size: 20px;
+        }
+
+        .try-form {
+            display: flex;
+            gap: 15px;
+            align-items: flex-end;
+        }
+
+        .form-group {
+            flex: 1;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 8px;
+            font-size: 14px;
+            background: rgba(255, 255, 255, 0.9);
+        }
+
+        .try-btn {
+            padding: 12px 30px;
+            background: white;
+            color: #667eea;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .try-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .response-box {
+            margin-top: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 15px;
+            border-radius: 8px;
+            display: none;
+        }
+
+        .response-box.show {
+            display: block;
+        }
+
+        .response-title {
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+
+        @media (max-width: 768px) {
+            .content {
+                padding: 20px;
+            }
+
+            .header h1 {
+                font-size: 24px;
+            }
+
+            .back-btn {
+                position: static;
+                transform: none;
+                display: inline-block;
+                margin-bottom: 15px;
+            }
+
+            .try-form {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <a href="/" class="back-btn">← 返回首页</a>
+            <h1>📚 API 接口文档</h1>
+            <p>物流凭证查询 RESTful API</p>
+        </div>
+
+        <div class="content">
+            <!-- 接口概述 -->
+            <div class="section">
+                <h2 class="section-title">接口概述</h2>
+                <div class="info-box">
+                    <div class="info-item">
+                        <span class="info-label">接口名称:</span>
+                        <span class="info-value">物流单号查询接口</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">基础URL:</span>
+                        <span class="info-value">http://127.0.0.1:5000</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">返回格式:</span>
+                        <span class="info-value">JSON</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">字符编码:</span>
+                        <span class="info-value">UTF-8</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 接口详情 -->
+            <div class="section">
+                <h2 class="section-title">接口详情</h2>
+                <div class="endpoint">
+                    <span class="method-badge">GET</span>
+                    /api/tracking/&lt;tracking_no&gt;
+                </div>
+                <p style="color: #6c757d; margin-bottom: 20px;">
+                    通过物流单号查询订单的签收状态、签收时间和签收凭证图片URL
+                </p>
+
+                <h3 style="margin: 20px 0 10px; color: #495057;">请求参数</h3>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>参数名</th>
+                                <th>类型</th>
+                                <th>位置</th>
+                                <th>必填</th>
+                                <th>说明</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>tracking_no</strong></td>
+                                <td>String</td>
+                                <td>Path</td>
+                                <td>是</td>
+                                <td>物流单号</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- 返回示例 -->
+            <div class="section">
+                <h2 class="section-title">返回示例</h2>
+                
+                <h3 style="margin: 20px 0 10px; color: #495057;">
+                    <span class="status-code status-200">200 OK</span> 查询成功
+                </h3>
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">复制</button>
+                    <pre>{
+  "code": 200,
+  "message": "查询成功",
+  "data": {
+    "order_no": "200014292751543-1JAAWKHOGNF7",
+    "logistics_channel": "OnTrac",
+    "tracking_no": "1LSCXLNA025005144",
+    "query_time": "2025-12-30 13:28:34",
+    "logistics_status": "已签收",
+    "signed_time": "2025-12-13",
+    "image_url": "http://192.168.1.88:18888/xxx.png"
+  }
+}</pre>
+                </div>
+
+                <h3 style="margin: 20px 0 10px; color: #495057;">
+                    <span class="status-code status-404">404 Not Found</span> 未找到数据
+                </h3>
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">复制</button>
+                    <pre>{
+  "code": 404,
+  "message": "未找到该物流单号的信息",
+  "data": null
+}</pre>
+                </div>
+
+                <h3 style="margin: 20px 0 10px; color: #495057;">
+                    <span class="status-code status-500">500 Error</span> 服务器错误
+                </h3>
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">复制</button>
+                    <pre>{
+  "code": 500,
+  "message": "数据库错误: xxx",
+  "data": null
+}</pre>
+                </div>
+            </div>
+
+            <!-- 返回字段说明 -->
+            <div class="section">
+                <h2 class="section-title">返回字段说明</h2>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>字段名</th>
+                                <th>类型</th>
+                                <th>说明</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>code</strong></td>
+                                <td>Integer</td>
+                                <td>状态码 (200:成功, 404:未找到, 500:服务器错误)</td>
+                            </tr>
+                            <tr>
+                                <td><strong>message</strong></td>
+                                <td>String</td>
+                                <td>返回消息</td>
+                            </tr>
+                            <tr>
+                                <td><strong>data</strong></td>
+                                <td>Object</td>
+                                <td>数据对象 (失败时为null)</td>
+                            </tr>
+                            <tr>
+                                <td>&nbsp;&nbsp;├─ order_no</td>
+                                <td>String</td>
+                                <td>订单号</td>
+                            </tr>
+                            <tr>
+                                <td>&nbsp;&nbsp;├─ logistics_channel</td>
+                                <td>String</td>
+                                <td>物流渠道</td>
+                            </tr>
+                            <tr>
+                                <td>&nbsp;&nbsp;├─ tracking_no</td>
+                                <td>String</td>
+                                <td>物流单号</td>
+                            </tr>
+                            <tr>
+                                <td>&nbsp;&nbsp;├─ query_time</td>
+                                <td>String</td>
+                                <td>查询时间 (格式: YYYY-MM-DD HH:MM:SS)</td>
+                            </tr>
+                            <tr>
+                                <td>&nbsp;&nbsp;├─ logistics_status</td>
+                                <td>String</td>
+                                <td>物流状态 (已签收/运输中/派送中等)</td>
+                            </tr>
+                            <tr>
+                                <td>&nbsp;&nbsp;├─ signed_time</td>
+                                <td>String</td>
+                                <td>签收时间 (格式: YYYY-MM-DD, 未签收时为null)</td>
+                            </tr>
+                            <tr>
+                                <td>&nbsp;&nbsp;└─ image_url</td>
+                                <td>String</td>
+                                <td>签收凭证图片URL</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- 代码示例 -->
+            <div class="section">
+                <h2 class="section-title">代码示例</h2>
+                
+                <h3 style="margin: 20px 0 10px; color: #495057;">Python</h3>
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">复制</button>
+                    <pre>import requests
+
+url = "http://127.0.0.1:5000/api/tracking/1LSCXLNA025005144"
+response = requests.get(url)
+data = response.json()
+
+if data['code'] == 200:
+    print(f"物流状态: {data['data']['logistics_status']}")
+    print(f"签收时间: {data['data']['signed_time']}")
+    print(f"凭证图片: {data['data']['image_url']}")</pre>
+                </div>
+
+                <h3 style="margin: 20px 0 10px; color: #495057;">JavaScript</h3>
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">复制</button>
+                    <pre>fetch('http://127.0.0.1:5000/api/tracking/1LSCXLNA025005144')
+  .then(response => response.json())
+  .then(data => {
+    if (data.code === 200) {
+      console.log('物流状态:', data.data.logistics_status);
+      console.log('签收时间:', data.data.signed_time);
+      console.log('凭证图片:', data.data.image_url);
+    }
+  });</pre>
+                </div>
+
+                <h3 style="margin: 20px 0 10px; color: #495057;">cURL</h3>
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">复制</button>
+                    <pre>curl -X GET "http://127.0.0.1:5000/api/tracking/1LSCXLNA025005144"</pre>
+                </div>
+            </div>
+
+            <!-- 在线测试 -->
+            <div class="try-it">
+                <h3>🚀 在线测试</h3>
+                <div class="try-form">
+                    <div class="form-group">
+                        <label>物流单号</label>
+                        <input type="text" id="testTrackingNo" placeholder="请输入物流单号" value="1LSCXLNA025005144">
+                    </div>
+                    <button class="try-btn" onclick="testAPI()">发送请求</button>
+                </div>
+                <div class="response-box" id="responseBox">
+                    <div class="response-title">响应结果:</div>
+                    <div class="code-block" style="margin: 10px 0 0 0;">
+                        <pre id="responseContent"></pre>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 注意事项 -->
+            <div class="section">
+                <h2 class="section-title">注意事项</h2>
+                <div class="info-box">
+                    <p style="margin-bottom: 10px; color: #495057;">1. 签收时间格式统一为 <strong>YYYY-MM-DD</strong> (如: 2025-12-13)</p>
+                    <p style="margin-bottom: 10px; color: #495057;">2. 未签收的订单，<strong>signed_time</strong> 字段为 <strong>null</strong></p>
+                    <p style="margin-bottom: 10px; color: #495057;">3. 物流单号区分大小写，请确保准确性</p>
+                    <p style="margin-bottom: 10px; color: #495057;">4. 建议设置合理的请求超时时间</p>
+                    <p style="color: #495057;">5. 生产环境请使用 HTTPS 协议</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function copyCode(btn) {
+            const codeBlock = btn.parentElement.querySelector('pre');
+            const text = codeBlock.textContent;
+            
+            navigator.clipboard.writeText(text).then(() => {
+                const originalText = btn.textContent;
+                btn.textContent = '已复制!';
+                setTimeout(() => {
+                    btn.textContent = originalText;
+                }, 2000);
+            });
+        }
+
+        function testAPI() {
+            const trackingNo = document.getElementById('testTrackingNo').value.trim();
+            const responseBox = document.getElementById('responseBox');
+            const responseContent = document.getElementById('responseContent');
+
+            if (!trackingNo) {
+                alert('请输入物流单号');
+                return;
+            }
+
+            responseContent.textContent = '请求中...';
+            responseBox.classList.add('show');
+
+            fetch(`/api/tracking/${trackingNo}`)
+                .then(response => response.json())
+                .then(data => {
+                    responseContent.textContent = JSON.stringify(data, null, 2);
+                })
+                .catch(error => {
+                    responseContent.textContent = `请求失败: ${error.message}`;
+                });
+        }
+    </script>
+</body>
+</html>
