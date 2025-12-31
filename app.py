@@ -83,13 +83,21 @@ def index():
     order_no = request.args.get('order_no', '').strip()
     tracking_no = request.args.get('tracking_no', '').strip()
     
-    # 查询数据
-    data = get_logistics_data(order_no=order_no, tracking_no=tracking_no)
+    error_message = None
+    data = []
+    
+    try:
+        # 查询数据
+        data = get_logistics_data(order_no=order_no, tracking_no=tracking_no)
+    except Exception as e:
+        error_message = str(e)
+        print(f"查询错误: {e}")
     
     return render_template('index.html', 
                          records=data, 
                          order_no=order_no, 
-                         tracking_no=tracking_no)
+                         tracking_no=tracking_no,
+                         error_message=error_message)
 
 @app.route('/api-docs')
 def api_docs():

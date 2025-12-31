@@ -357,6 +357,58 @@
             opacity: 0.3;
         }
 
+        .empty-state-icon {
+            font-size: 80px;
+            margin-bottom: 20px;
+        }
+
+        .empty-state-title {
+            font-size: 24px;
+            font-weight: 600;
+            color: #495057;
+            margin-bottom: 10px;
+        }
+
+        .empty-state-desc {
+            font-size: 14px;
+            color: #6c757d;
+            margin-top: 10px;
+        }
+
+        .empty-state-tips {
+            margin-top: 20px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            text-align: left;
+            display: inline-block;
+        }
+
+        .empty-state-tips ul {
+            margin: 10px 0;
+            padding-left: 20px;
+        }
+
+        .empty-state-tips li {
+            margin: 5px 0;
+            color: #495057;
+        }
+
+        .error-state {
+            text-align: center;
+            padding: 60px 20px;
+            background: #fff3cd;
+            border: 2px solid #ffc107;
+            border-radius: 10px;
+            margin: 20px;
+        }
+
+        .error-state-icon {
+            font-size: 80px;
+            margin-bottom: 20px;
+            color: #856404;
+        }
+
         .footer {
             text-align: center;
             padding: 20px;
@@ -438,6 +490,27 @@
             </div>
         </div>
 
+        {% if error_message %}
+        <!-- 错误提示 -->
+        <div class="error-state">
+            <div class="error-state-icon">⚠️</div>
+            <div class="empty-state-title" style="color: #856404;">查询异常</div>
+            <div class="empty-state-desc" style="color: #856404;">
+                系统处理请求时发生错误，请稍后重试
+            </div>
+            <div class="empty-state-tips" style="background: #fff; border: 1px solid #ffc107;">
+                <strong>错误详情:</strong>
+                <p style="margin: 10px 0; color: #856404; font-family: monospace;">{{ error_message }}</p>
+                <strong>🔧 解决建议:</strong>
+                <ul>
+                    <li>请检查网络连接是否正常</li>
+                    <li>确认数据库服务是否运行</li>
+                    <li>如问题持续，请联系系统管理员</li>
+                </ul>
+            </div>
+        </div>
+        {% endif %}
+
         <div class="table-container">
             {% if records %}
             <table>
@@ -490,11 +563,34 @@
                     {% endfor %}
                 </tbody>
             </table>
-            {% else %}
+            {% elif order_no or tracking_no %}
+            <!-- 查询后未找到结果 -->
             <div class="empty-state">
-                <div style="font-size: 64px; margin-bottom: 20px;">📦</div>
-                <h3>暂无数据</h3>
-                <p style="margin-top: 10px;">还没有物流凭证记录</p>
+                <div class="empty-state-icon">🔍</div>
+                <div class="empty-state-title">未查询到相关记录</div>
+                <div class="empty-state-desc">
+                    没有找到与“
+                    {% if order_no %}<strong>{{ order_no }}</strong>{% endif %}
+                    {% if order_no and tracking_no %} / {% endif %}
+                    {% if tracking_no %}<strong>{{ tracking_no }}</strong>{% endif %}
+                    ”匹配的记录
+                </div>
+                <div class="empty-state-tips">
+                    <strong>💡 搜索建议:</strong>
+                    <ul>
+                        <li>请检查订单号或物流单号是否输入正确</li>
+                        <li>系统支持模糊查询，可以输入部分关键字</li>
+                        <li>物流单号区分大小写，请注意大小写</li>
+                        <li>请确认该订单是否已录入系统</li>
+                    </ul>
+                </div>
+            </div>
+            {% else %}
+            <!-- 初始状态，无数据 -->
+            <div class="empty-state">
+                <div class="empty-state-icon">📦</div>
+                <div class="empty-state-title">暂无数据</div>
+                <div class="empty-state-desc">请使用上方搜索框查询订单信息</div>
             </div>
             {% endif %}
         </div>
