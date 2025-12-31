@@ -485,8 +485,19 @@
                 <div class="stat-label">已签收</div>
             </div>
             <div class="stat-item">
-                <div class="stat-number">{{ records|selectattr('logistics_status', 'ne', '已签收')|list|length }}</div>
+                <div class="stat-number">{{ records|rejectattr('logistics_status', 'equalto', '已签收')|list|length }}</div>
                 <div class="stat-label">运输中</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number">{{ records|selectattr('logistics_status', 'equalto', '派送中')|list|length }}</div>
+                <div class="stat-label">派送中</div>
+            </div>
+            <div class="stat-item">
+                {% set unsigned_count = records|selectattr('signed_time', 'none')|list|length %}
+                <div class="stat-number" {% if unsigned_count > 0 %}style="color: #ffc107;"{% endif %}>
+                    {{ unsigned_count }}
+                </div>
+                <div class="stat-label">未签收</div>
             </div>
         </div>
 
