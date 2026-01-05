@@ -26,6 +26,14 @@ def normalize_status(status):
         return '已签收'
     return status
 
+def normalize_signed_time(signed_time):
+    """处理签收时间: 将 'None' 字符串转为 None"""
+    if signed_time is None:
+        return None
+    if isinstance(signed_time, str) and signed_time.lower() in ['none', 'null', '']:
+        return None
+    return signed_time
+
 def get_logistics_data(order_no=None, tracking_no=None):
     """获取物流凭证数据"""
     connection = None
